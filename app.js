@@ -411,7 +411,7 @@ document.addEventListener("DOMContentLoaded", () => {
       canvas.width = 100; 
       canvas.height = 100;
 
-      let loaded = 0, currentFrame = 0;
+      let loaded = 0, currentFrame = 0, lastFrameIndex = -1;
 
       // Preload frames
       framePaths.forEach((src, i) => {
@@ -423,11 +423,29 @@ document.addEventListener("DOMContentLoaded", () => {
         frames[i] = img;
       });
 
-      const render = () => {
+      const drawState = { y: 0 };
+
+      const drawFrame = () => {
         const f = Math.floor(currentFrame);
         if (frames[f]?.complete) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(frames[f], 0, 0);
+          ctx.drawImage(frames[f], 0, drawState.y);
+        }
+      };
+
+      const render = () => {
+        const f = Math.floor(currentFrame);
+        if (frames[f]?.complete) {
+          if (f !== lastFrameIndex && lastFrameIndex !== -1) {
+            const isForward = f > lastFrameIndex;
+            const yOffset = isForward ? 0 : -0;
+            gsap.fromTo(drawState, 
+              { y: yOffset }, 
+              { y: 0, duration: 0.1, ease: "power2.out", overwrite: true, onUpdate: drawFrame }
+            );
+          }
+          lastFrameIndex = f;
+          drawFrame();
         }
       };
 
