@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
         infinite: false,
     });
 
+    window.lenis = lenis;
+
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add((time) => {
         lenis.raf(time * 1000);
@@ -665,6 +667,66 @@ document.addEventListener("DOMContentLoaded", () => {
       duration : 1,
     },5.5);
 
+
+
+
+
+
+
+    
+    const flowers = document.querySelectorAll(".flower-container > img");
+	
+	// Pre-extract the target rotations from CSS
+	const targetRotations = [
+		-32, 15, -42, 28, -5, 12, -20, 40, -38, 22
+	];
+
+	// Initial State
+	gsap.set(flowers, {
+		y: "0%",
+		rotation: 0
+	});
+
+	// Trigger animation on scroll
+	const animateFlowers = () => {
+		// Kill any existing wiggle tweens
+		gsap.killTweensOf(flowers);
+		
+		gsap.fromTo(flowers, 
+			{ y: "20%", rotation: 0 },
+			{
+				y: 0,
+				rotation: (i) => targetRotations[i],
+				duration: 1.5,
+				ease: "power3.out",
+				stagger: 0.1,
+				onComplete: () => {
+					// Gentle wiggle after slide-in
+					flowers.forEach((flower, i) => {
+						const baseAngle = targetRotations[i];
+						gsap.to(flower, {
+							rotation: baseAngle + 5,
+							duration: 2 + Math.random(),
+							repeat: -1,
+							yoyo: true,
+							ease: "sine.inOut"
+						});
+					});
+				}
+			}
+		);
+	};
+
+	ScrollTrigger.create({
+		trigger: ".flower-container",
+		start: "top 100%",
+		onEnter: animateFlowers,
+		onEnterBack: animateFlowers,
+		onLeaveBack: () => {
+			gsap.killTweensOf(flowers);
+			gsap.set(flowers, { y: "100%", rotation: 0 });
+		}
+	});
 
 
 

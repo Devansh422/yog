@@ -40,6 +40,40 @@ body::-webkit-scrollbar {
   display: none; /* For Chrome, Safari, and Opera */
 }
 
+.device-restriction {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: #111;
+	color: #fff;
+	display: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+	text-align: center;
+	padding: 2rem;
+}
+
+.device-restriction h1 {
+	font-family: 'Heading', sans-serif;
+	font-size: 3rem;
+	text-transform: uppercase;
+	line-height: 1;
+}
+
+@media (max-width: 1024px) {
+	.device-restriction {
+		display: flex;
+	}
+	body {
+		overflow: hidden !important;
+		height: 100vh;
+	}
+}
+
 img{
 	height: 100%;
 	width: 100%;
@@ -339,7 +373,7 @@ h1{
       display: flex; justify-content: center; align-items: center;
       z-index: 2; pointer-events: none;
     }
-    canvas {
+    .canvasContainer canvas {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 100px; height: 100px; max-width: 100px; max-height: 100px;
       background: #FF004F; border-radius: 10px; pointer-events: none;
@@ -446,3 +480,136 @@ h1{
         left: calc(50% + 4rem);
       }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .flower-container{
+            position: relative;
+			height: 100vh;
+			width: 100%;
+			display: flex;
+			align-items: flex-end;
+			justify-content: center;
+      overflow: hidden;
+		}
+		.flower-container img{
+			position: absolute;
+			width: auto;
+			height: 80vh;
+			transform-origin: bottom center;
+      margin-bottom: -100px;
+		}
+		.flower-container img:nth-child(1){transform: rotate(-32deg);}
+		.flower-container img:nth-child(2){transform: rotate(15deg);}
+		.flower-container img:nth-child(3){transform: rotate(-42deg);}
+		.flower-container img:nth-child(4){transform: rotate(28deg);}
+		.flower-container img:nth-child(5){transform: rotate(-5deg);}
+		.flower-container img:nth-child(6){transform: rotate(12deg);}
+		.flower-container img:nth-child(7){transform: rotate(-20deg);}
+		.flower-container img:nth-child(8){transform: rotate(40deg);}
+		.flower-container img:nth-child(9){transform: rotate(-38deg);}
+		.flower-container img:nth-child(10){transform: rotate(22deg);}
+
+
+
+
+
+
+
+    .propose-container {
+			width: 100%;
+			height: 100vh;
+			background: transparent;
+			position: relative;
+			overflow: hidden;
+		}
+		.propose-popup {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%) scale(0.5);
+			background: rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(10px);
+			padding: 2rem 4rem;
+			border-radius: 20px;
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			color: #fff;
+			font-family: 'Heading', sans-serif;
+			text-align: center;
+			opacity: 0;
+			pointer-events: none;
+			z-index: 10;
+		}
+		.propose-popup h1 {
+			font-size: 3rem;
+			margin: 0;
+			text-transform: uppercase;
+			letter-spacing: 5px;
+		}
+		.propose-popup button {
+			margin-top: 2rem;
+			padding: 1rem 3rem;
+			font-family: inherit;
+			font-size: 1.5rem;
+			font-weight: 900;
+			background: #fff;
+			color: #111;
+			border: none;
+			border-radius: 50px;
+			cursor: pointer;
+			text-transform: uppercase;
+			transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		}
+		.propose-popup button:hover {
+			transform: scale(1.1);
+		}
+		.propose-popup button:active {
+			transform: scale(0.95);
+		}
+
+
+.lower-overlay{
+  position: absolute;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  animation: none;
+  transform: none;
+  z-index:-1;
+}
+
+.lower-overlay img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02) rotate(0);
+}
+
+.lower-overlay .blender{
+  background: linear-gradient(0deg,rgba(249, 235, 224, 1) 0%, rgba(249, 235, 224, 0) 100%);
+  position: absolute;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 11;
+}

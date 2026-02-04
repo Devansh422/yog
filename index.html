@@ -10,10 +10,12 @@
 
 <body>
 
-
+    <div class="device-restriction">
+        <h1>open in laptop cuitee</h1>
+    </div>
 
     <section class="hero" style="position:relative;height: 100vh; background: var(--base);">
-        
+         
         <div class="profile-images">
             <div class="pimg"><img src="test-images/final/test/1.png"></div>
             <div class="pimg"><img src="test-images/final/test/2.png"></div>
@@ -38,6 +40,7 @@
             <div class="name"><h1>Svelte</h1></div>
             <div class="name"><h1>Etoile</h1></div>
         </div>
+
 
     </section>
     <section class="spotlight">
@@ -86,7 +89,7 @@
         <h1>Each frame feels</h1>
         <div class="gallery"></div>
     </section>
-    <section class="sticky-cards">
+    <!-- <section class="sticky-cards">
         <div class="card" id="card-1">
             <div class="card-inner">
                 <div class="card-info"></div>
@@ -123,14 +126,37 @@
             </div>
         </div>
 
+    </section> -->
+
+
+    <div class="propose-container" id="proposeContainer">
+	<div class="propose-popup" id="proposePopup">
+		<h1>Will you?</h1>
+		<button id="acceptBtn">YES</button>
+	</div>
+</div>
+
+    <section class="flower-container">
+        <img src="./flowers/1.webp" alt="">
+<img src="./flowers/2.webp" alt="">
+<img src="./flowers/3.webp" alt="">
+<img src="./flowers/4.webp" alt="">
+<img src="./flowers/5.webp" alt="">
+<img src="./flowers/6.webp" alt="">
+<img src="./flowers/7.webp" alt="">
+<img src="./flowers/8.webp" alt="">
+<img src="./flowers/9.webp" alt="">
+<img src="./flowers/10.webp" alt="">
+<div class="lower-overlay">
+            <div class="blender"></div>
+            <img src="./shot-01.png" style="transform: rotate(0deg);">
+        </div>
     </section>
-    <section style="position:relative;height: 100vh;"></section>
 
 
 
 
-
-<!-- 
+ 
     <div class="preloader">
   <div class="intro-line">
     <h1>YOGRATNAM</h1>
@@ -146,7 +172,7 @@
   <div class="outro-title">
     <h1>OG</h1>
   </div>
-</div> -->
+</div>
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
@@ -155,5 +181,176 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/CustomEase.min.js"></script>
 <script src="app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+  {
+	"imports": {
+	  "three": "https://unpkg.com/three@0.156.1/build/three.module.js",
+	  "three/addons/": "https://unpkg.com/three@0.156.1/examples/jsm/"
+	}
+  }
+</script>
+
+<script type="module">
+	import * as THREE from 'three';
+	import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+	import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+	gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+	/**
+	 * Isolates the Propose section logic to prevent conflicts with other Three.js/Canvas instances
+	 * @param {string} containerId - The ID of the container element
+	 * @param {string} destinationSelector - The selector to scroll to after clicking YES
+	 */
+	function initProposeSection(containerId, destinationSelector) {
+		const container = document.getElementById(containerId);
+		if (!container) return;
+
+		const width = container.clientWidth;
+		const height = container.clientHeight;
+
+		// --- Local Scoped Three.js Objects ---
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+		camera.position.set(0, 0, 5);
+
+		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+		renderer.setSize(width, height);
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		renderer.toneMappingExposure = 1.2;
+		renderer.outputColorSpace = THREE.SRGBColorSpace;
+		container.appendChild(renderer.domElement);
+
+		const controls = new OrbitControls(camera, renderer.domElement);
+		controls.enableDamping = true;
+		controls.dampingFactor = 0.05;
+		controls.enableZoom = false;
+		controls.enablePan = false;
+
+		// Environment Loading
+		const pmremGenerator = new THREE.PMREMGenerator(renderer);
+		pmremGenerator.compileEquirectangularShader();
+
+		new RGBELoader().load('neutral.hdr', (texture) => {
+			const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+			scene.environment = envMap;
+			texture.dispose();
+			pmremGenerator.dispose();
+		});
+
+		// Model Loading & Animation setup
+		let model;
+		let centeredPosition;
+		
+		new GLTFLoader().load('red_rose.glb', (gltf) => {
+			model = gltf.scene;
+			
+			model.traverse((child) => {
+				if (child.isMesh && child.material) {
+					child.material.envMapIntensity = 1.5;
+					if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
+					child.material.needsUpdate = true;
+				}
+			});
+
+			// Scaling & Centering
+			const box = new THREE.Box3().setFromObject(model);
+			const size = box.getSize(new THREE.Vector3());
+			const center = box.getCenter(new THREE.Vector3());
+			const scale = 4 / Math.max(size.x, size.y, size.z);
+			model.scale.setScalar(scale);
+			centeredPosition = new THREE.Vector3().copy(center).multiplyScalar(scale).negate();
+			model.position.copy(centeredPosition);
+			scene.add(model);
+
+			// Animation Constants
+			const targetPos = { x: 2.57, y: 2.73, z: -0.45 };
+			const targetRot = { x: -1.73, y: 0.75, z: 1.81 };
+
+			// GSAP Timeline (Scoped to this section)
+			const tl = gsap.timeline({
+				scrollTrigger: {
+					trigger: `#${containerId}`,
+					start: "top top",
+					pin: true,
+					pinSpacing: true,
+					toggleActions: "restart none none none",
+					onEnter: () => {
+						if (window.lenis) window.lenis.stop();
+						document.body.style.overflow = 'hidden';
+						camera.position.set(0, 0, 5);
+						camera.rotation.set(0, 0, 0);
+						model.position.copy(centeredPosition);
+						model.rotation.set(0, 0, 0);
+						controls.update();
+						// Scoped popup selection
+						const localPopup = container.querySelector('.propose-popup');
+						if (localPopup) {
+							gsap.set(localPopup, { opacity: 0, scale: 0.5, pointerEvents: "none" });
+						}
+					}
+				}
+			});
+
+			tl.from(model.position, { y: centeredPosition.y - 5, z: 10, duration: 2, ease: "power4.out" })
+			  .to(camera.position, { ...targetPos, duration: 2.5, ease: "power2.inOut" }, "-=1")
+			  .to(camera.rotation, { ...targetRot, duration: 2.5, ease: "power2.inOut" }, "<");
+
+			// Scoped popup reveal
+			const localPopup = container.querySelector('.propose-popup');
+			if (localPopup) {
+				tl.to(localPopup, { opacity: 1, scale: 1, duration: 1, ease: "back.out(1.7)", pointerEvents: "auto" }, "-=0.5");
+			}
+
+			// Scoped Button Interaction
+			const localBtn = container.querySelector('button');
+			if (localBtn && localPopup) {
+				localBtn.addEventListener('click', () => {
+					gsap.to(localPopup, {
+						opacity: 0, scale: 0.5, duration: 0.5, ease: "power2.in",
+						onComplete: () => {
+							const exitTl = gsap.timeline({
+								onComplete: () => {
+									if (window.lenis) window.lenis.start();
+									document.body.style.overflow = '';
+									gsap.to(window, { scrollTo: { y: destinationSelector, autoKill: false }, duration: 1.5, ease: "power2.inOut" });
+								}
+							});
+							exitTl.to(model.position, { y: centeredPosition.y - 5, z: 10, duration: 2, ease: "power4.in" })
+							      .to(model.rotation, { y: "+=" + (Math.PI * 2), duration: 2, ease: "power2.inOut" }, "<");
+						}
+					});
+				});
+			}
+		});
+
+		// Scoped Resize Handler
+		const handleResize = () => {
+			const w = container.clientWidth;
+			const h = container.clientHeight;
+			camera.aspect = w / h;
+			camera.updateProjectionMatrix();
+			renderer.setSize(w, h);
+		};
+		window.addEventListener('resize', handleResize);
+
+		// Scoped Animation Loop
+		const animate = () => {
+			requestAnimationFrame(animate);
+			controls.update();
+			renderer.render(scene, camera);
+		};
+		animate();
+	}
+
+	// Initialize with the specific ID and destination
+	initProposeSection('proposeContainer', '.flower-container');
+</script>
 
 </html>
